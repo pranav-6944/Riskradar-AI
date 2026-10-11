@@ -13,6 +13,7 @@ from risk_engine import store, analyze_text, COMPANIES
 from llm_explainer import stream_explanation, get_explanation
 from data_simulator import simulator
 from models import AnalyzeRequest, IngestRequest, SimulationToggleRequest, ScenarioTestRequest
+from finnhub_client import finnhub, TICKER_MAP
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -115,6 +116,46 @@ async def trigger_instant_event():
     """Generates an instant random simulated event."""
     result = await simulator.generate_single_event()
     return result
+
+# ─── Live Finnhub Stock News Integration Endpoints ──────────────────────
+@app.get("/api/v1/finnhub/news/{ticker}")
+async def get_finnhub_news(ticker: str, limit: int = 10):
+    """Fetches real-world live financial news for a ticker directly from Finnhub API."""
+    ticker = ticker.upper()
+    articles = await finnhub.fetch_company_news(ticker)
+    return {
+        "ticker": ticker,
+        "company": TICKER_MAP.get(ticker, ticker),
+        "total": len(articles),
+        "articles": articles[:limit]
+    }
+
+@app.post("/api/v1/finnhub/sync/{ticker}")
+async def sync_finnhub_news(ticker: str, index: int = Query(0, ge=0)):
+    """Fetches live article from Finnhub, classifies via 120+ NLP rules, updates CRI, and relays to Spring Boot."""
+    ticker = ticker.upper()
+    result = await finnhub.ingest_live_news_item(ticker, item_index=index)
+    if not result:
+        raise HTTPException(status_code=502, detail=f"Failed to fetch live articles from Finnhub for {ticker}")
+    return {
+        "status": "success",
+        "ticker": ticker,
+        "source": "Finnhub Live Stock API",
+        "result": result
+    }
+
+@app.post("/api/v1/finnhub/sync-all")
+async def sync_all_finnhub_banks():
+    """Fetches live news for all 5 tracked banks simultaneously from Finnhub."""
+    results = []
+    for ticker in TICKER_MAP.keys():
+        try:
+            res = await finnhub.ingest_live_news_item(ticker)
+            if res:
+                results.append({"ticker": ticker, "event": res.get("event")})
+        except Exception as e:
+            print(f"[Finnhub] Error syncing {ticker}: {e}")
+    return {"synced_count": len(results), "events": results}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

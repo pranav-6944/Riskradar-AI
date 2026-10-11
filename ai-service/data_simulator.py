@@ -114,10 +114,23 @@ class DataSimulator:
 
     async def _simulation_loop(self):
         # Initial sleep before first emit
-        await asyncio.sleep(4)
+        await asyncio.sleep(3)
+        loop_count = 0
         while self._running:
             try:
-                await self.generate_single_event()
+                loop_count += 1
+                # Interleave real live Finnhub news every 3rd cycle
+                if loop_count % 3 == 0:
+                    try:
+                        from finnhub_client import finnhub, TICKER_MAP
+                        random_ticker = random.choice(list(TICKER_MAP.keys()))
+                        res = await finnhub.ingest_live_news_item(random_ticker, item_index=random.randint(0, 8))
+                        if not res:
+                            await self.generate_single_event()
+                    except Exception:
+                        await self.generate_single_event()
+                else:
+                    await self.generate_single_event()
             except Exception as e:
                 print(f"[Simulator] Error: {e}")
             

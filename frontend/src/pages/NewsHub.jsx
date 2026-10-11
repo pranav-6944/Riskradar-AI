@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Newspaper, ShieldAlert, Filter, Search, Zap, 
-  AlertTriangle, CheckCircle2, Clock, Sparkles, RefreshCw 
+  AlertTriangle, CheckCircle2, Clock, Sparkles, RefreshCw, Radio 
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export const NewsHub = () => {
   const [events, setEvents] = useState([]);
@@ -10,6 +11,8 @@ export const NewsHub = () => {
   const [selectedCompany, setSelectedCompany] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [injecting, setInjecting] = useState(false);
+  const [finnhubSyncing, setFinnhubSyncing] = useState(false);
+  const { isDark } = useTheme();
 
   const fetchNews = async () => {
     try {
@@ -25,7 +28,7 @@ export const NewsHub = () => {
 
   useEffect(() => {
     fetchNews();
-    const interval = setInterval(fetchNews, 4000);
+    const interval = setInterval(fetchNews, 3500);
     return () => clearInterval(interval);
   }, []);
 
@@ -58,6 +61,38 @@ export const NewsHub = () => {
     }
   };
 
+  const syncFinnhubNews = async (ticker = 'JPM') => {
+    setFinnhubSyncing(true);
+    try {
+      const res = await fetch(`/ai-api/api/v1/finnhub/sync/${ticker}`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        await fetchNews();
+      }
+    } catch (err) {
+      console.error('Finnhub sync failed:', err);
+    } finally {
+      setFinnhubSyncing(false);
+    }
+  };
+
+  const syncAllFinnhub = async () => {
+    setFinnhubSyncing(true);
+    try {
+      const res = await fetch('/ai-api/api/v1/finnhub/sync-all', {
+        method: 'POST',
+      });
+      if (res.ok) {
+        await fetchNews();
+      }
+    } catch (err) {
+      console.error('Finnhub sync all failed:', err);
+    } finally {
+      setFinnhubSyncing(false);
+    }
+  };
+
   const filteredEvents = events.filter((e) => {
     if (filterType === 'critical' && !e.highRisk) return false;
     if (filterType === 'routine' && e.highRisk) return false;
@@ -67,19 +102,19 @@ export const NewsHub = () => {
   });
 
   return (
-    <div className="py-8 px-4 lg:px-8 max-w-7xl mx-auto space-y-8">
+    <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 transition-colors duration-300">
       {/* ─── Header ─────────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-slate-800/80 dark:border-slate-800/80 light:border-slate-200">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white m-0">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white dark:text-white light:text-slate-900 m-0 font-heading">
               Regulatory Stream & Noise Filter
             </h1>
-            <span className="clay-badge text-xs text-indigo-400 bg-indigo-950/60 border-indigo-500/30">
+            <span className="clay-badge text-xs text-indigo-400 dark:text-indigo-400 light:text-indigo-600 bg-indigo-500/10 border-indigo-500/30">
               Live Ingestion Feed
             </span>
           </div>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-400 dark:text-slate-400 light:text-slate-600 mt-1">
             Continuous NLP evaluation separating critical legal/operational alerts from routine corporate PR.
           </p>
         </div>
@@ -89,7 +124,7 @@ export const NewsHub = () => {
           <button
             onClick={() => injectQuickEvent('doj')}
             disabled={injecting}
-            className="clay-btn clay-btn-danger text-xs py-2 px-3"
+            className="clay-btn clay-btn-danger text-xs py-2 px-3 shadow-sm"
             title="Inject DOJ Indictment"
           >
             <AlertTriangle className="w-3.5 h-3.5" />
@@ -98,7 +133,7 @@ export const NewsHub = () => {
           <button
             onClick={() => injectQuickEvent('sanctions')}
             disabled={injecting}
-            className="clay-btn clay-btn-primary text-xs py-2 px-3"
+            className="clay-btn clay-btn-primary text-xs py-2 px-3 shadow-sm"
             title="Inject AML Sanctions Violation"
           >
             <ShieldAlert className="w-3.5 h-3.5" />
@@ -107,11 +142,71 @@ export const NewsHub = () => {
           <button
             onClick={() => injectQuickEvent('noise')}
             disabled={injecting}
-            className="clay-btn clay-btn-secondary text-xs py-2 px-3"
+            className="clay-btn clay-btn-secondary text-xs py-2 px-3 shadow-sm"
             title="Inject PR Noise"
           >
             <span>+ PR Noise</span>
           </button>
+        </div>
+      </div>
+
+      {/* ─── LIVE FINNHUB API INTEGRATION BANNER ──────────────────────── */}
+      <div className="clay-card p-4 sm:p-5 border-sky-500/30 relative overflow-hidden shadow-lg" style={{ background: isDark ? 'linear-gradient(135deg, rgba(8, 28, 56, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)' : 'linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%)' }}>
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-sky-500/20 border border-sky-400/30 text-sky-400 shadow-md">
+              <Zap className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-white dark:text-white light:text-slate-900 m-0 font-heading">
+                  Live Finnhub Stock API Wire
+                </h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-emerald-500/10 text-emerald-400 dark:text-emerald-400 light:text-emerald-600 border border-emerald-500/30">
+                  LIVE REST API CONNECTED
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-600 mt-0.5">
+                Real-world Wall Street market news pulled via live Finnhub API key and processed through our 120+ regex engine.
+              </p>
+            </div>
+          </div>
+
+          {/* Live Sync Buttons */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => syncFinnhubNews('JPM')}
+              disabled={finnhubSyncing}
+              className="clay-btn clay-btn-secondary text-xs py-2 px-3 flex items-center gap-1.5"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${finnhubSyncing ? 'animate-spin' : ''}`} />
+              <span>Sync JPM</span>
+            </button>
+            <button
+              onClick={() => syncFinnhubNews('GS')}
+              disabled={finnhubSyncing}
+              className="clay-btn clay-btn-secondary text-xs py-2 px-3 flex items-center gap-1.5"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${finnhubSyncing ? 'animate-spin' : ''}`} />
+              <span>Sync GS</span>
+            </button>
+            <button
+              onClick={() => syncFinnhubNews('WFC')}
+              disabled={finnhubSyncing}
+              className="clay-btn clay-btn-secondary text-xs py-2 px-3 flex items-center gap-1.5"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${finnhubSyncing ? 'animate-spin' : ''}`} />
+              <span>Sync WFC</span>
+            </button>
+            <button
+              onClick={syncAllFinnhub}
+              disabled={finnhubSyncing}
+              className="clay-btn clay-btn-primary text-xs py-2 px-3.5 flex items-center gap-1.5 shadow-md"
+            >
+              <Zap className="w-3.5 h-3.5" />
+              <span>Sync All 5 Banks Live</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -135,7 +230,6 @@ export const NewsHub = () => {
             value={selectedCompany}
             onChange={(e) => setSelectedCompany(e.target.value)}
             className="clay-input text-xs py-2 px-3 cursor-pointer"
-            style={{ background: '#090e1a' }}
           >
             <option value="ALL">All Companies</option>
             <option value="JPMorgan Chase">JPMorgan Chase</option>
@@ -146,13 +240,15 @@ export const NewsHub = () => {
           </select>
 
           {/* Type Filter Buttons */}
-          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+          <div className="flex items-center gap-1 bg-slate-950/80 dark:bg-slate-950/80 light:bg-slate-100 p-1 rounded-xl border border-slate-800 dark:border-slate-800 light:border-slate-200">
             {['all', 'critical', 'routine'].map((t) => (
               <button
                 key={t}
                 onClick={() => setFilterType(t)}
                 className={`px-3 py-1 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer ${
-                  filterType === t ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white'
+                  filterType === t 
+                    ? 'bg-sky-500 text-white shadow-sm' 
+                    : 'text-slate-400 dark:text-slate-400 light:text-slate-600 hover:text-white'
                 }`}
               >
                 {t}
@@ -165,53 +261,74 @@ export const NewsHub = () => {
       {/* ─── Events Stream List ───────────────────────────────────────── */}
       <div className="space-y-3">
         {filteredEvents.length > 0 ? (
-          filteredEvents.map((evt) => (
-            <div
-              key={evt.id}
-              className={`clay-card p-5 transition-all ${
-                evt.highRisk ? 'border-rose-500/40 bg-slate-900/90' : 'border-slate-800/80 bg-slate-950/60'
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-2">
-                <div className="flex items-center gap-2.5">
-                  <span className={`clay-badge text-[10px] ${evt.highRisk ? 'text-rose-400 bg-rose-950/60 border-rose-500/50' : 'text-emerald-400 bg-emerald-950/40 border-emerald-500/40'}`}>
-                    {evt.highRisk ? 'HIGH RISK DETECTED' : 'FILTERED NOISE / ROUTINE'}
-                  </span>
-                  <span className="font-bold text-white text-sm">{evt.company}</span>
-                  <span className="font-mono text-xs text-sky-400">({evt.ticker})</span>
+          filteredEvents.map((evt) => {
+            const isFinnhub = evt.source && evt.source.includes('Finnhub');
+
+            return (
+              <div
+                key={evt.id}
+                className={`clay-card p-5 transition-all ${
+                  evt.highRisk 
+                    ? 'border-rose-500/40 bg-slate-900/90 dark:bg-slate-900/90 light:bg-rose-50/20' 
+                    : isFinnhub
+                    ? 'border-sky-500/40 bg-slate-950/80 dark:bg-slate-950/80 light:bg-sky-50/20'
+                    : 'border-slate-800/80 dark:border-slate-800/80 light:border-slate-200'
+                }`}
+              >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2.5">
+                    {isFinnhub && (
+                      <span className="clay-badge text-[10px] text-sky-400 dark:text-sky-400 light:text-sky-600 bg-sky-500/10 border-sky-500/40 font-mono">
+                        ⚡ LIVE FINNHUB API
+                      </span>
+                    )}
+                    <span className={`clay-badge text-[10px] ${
+                      evt.highRisk 
+                        ? 'text-rose-400 dark:text-rose-400 light:text-rose-600 bg-rose-500/10 border-rose-500/40' 
+                        : 'text-emerald-400 dark:text-emerald-400 light:text-emerald-600 bg-emerald-500/10 border-emerald-500/40'
+                    }`}>
+                      {evt.highRisk ? 'HIGH RISK DETECTED' : 'FILTERED NOISE / ROUTINE'}
+                    </span>
+                    <span className="font-bold text-white dark:text-white light:text-slate-900 text-sm">{evt.company}</span>
+                    <span className="font-mono text-xs text-sky-400 dark:text-sky-400 light:text-sky-600 font-semibold">({evt.ticker})</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-xs font-mono text-slate-400 dark:text-slate-400 light:text-slate-500">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>{evt.timestamp}</span>
+                    <span className="font-semibold text-slate-300 dark:text-slate-300 light:text-slate-700">· {evt.source}</span>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>{evt.timestamp}</span>
-                  <span>· {evt.source}</span>
+                {/* Event Text */}
+                <p className="text-sm text-slate-200 dark:text-slate-200 light:text-slate-800 leading-relaxed mb-3">
+                  {evt.text}
+                </p>
+
+                {/* Algorithmic Breakdown Pill */}
+                <div className="pt-3 border-t border-slate-800/80 dark:border-slate-800/80 light:border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                  <div className="text-slate-400 dark:text-slate-400 light:text-slate-500">
+                    <span className="text-sky-400 dark:text-sky-400 light:text-sky-600 font-semibold">Algorithmic Summary:</span> {evt.summary}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-slate-400 dark:text-slate-400 light:text-slate-500">Severity: {evt.severity}x</span>
+                    <span className={`font-bold px-2 py-0.5 rounded ${
+                      evt.riskDelta > 0 
+                        ? 'text-rose-400 dark:text-rose-400 light:text-rose-600 bg-rose-500/10' 
+                        : 'text-slate-400 dark:text-slate-400 light:text-slate-600 bg-slate-900/60 dark:bg-slate-900/60 light:bg-slate-200'
+                    }`}>
+                      +{evt.riskDelta?.toFixed(1)} ΔRisk
+                    </span>
+                  </div>
                 </div>
               </div>
-
-              {/* Event Text */}
-              <p className="text-sm text-slate-200 leading-relaxed mb-3">
-                {evt.text}
-              </p>
-
-              {/* Algorithmic Breakdown Pill */}
-              <div className="pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-                <div className="text-slate-400">
-                  <span className="text-sky-400">Algorithmic Summary:</span> {evt.summary}
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-slate-400">Severity: {evt.severity}x</span>
-                  <span className={`font-bold px-2 py-0.5 rounded ${evt.riskDelta > 0 ? 'text-rose-400 bg-rose-950/60' : 'text-slate-400 bg-slate-900'}`}>
-                    +{evt.riskDelta?.toFixed(1)} ΔRisk
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="text-center py-16 clay-card">
             <Newspaper className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-white mb-1">No Matching Ingestion Events</h3>
-            <p className="text-xs text-slate-400">Waiting for next continuous news packet or manual injection...</p>
+            <h3 className="text-base font-bold text-white dark:text-white light:text-slate-900 mb-1">No Matching Ingestion Events</h3>
+            <p className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-500">Waiting for next continuous news packet or manual injection...</p>
           </div>
         )}
       </div>

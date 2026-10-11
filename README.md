@@ -29,6 +29,7 @@
   <!-- AI & Python Badges -->
   <a href="https://www.python.org/" target="_blank"><img src="https://img.shields.io/badge/Python_3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" /></a>
   <a href="https://fastapi.tiangolo.com/" target="_blank"><img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" /></a>
+  <a href="https://finnhub.io/" target="_blank"><img src="https://img.shields.io/badge/Finnhub_Stock_API-Live_Feed-00D09C?style=for-the-badge&logo=statuspage&logoColor=white" alt="Finnhub" /></a>
   <a href="https://lmstudio.ai/" target="_blank"><img src="https://img.shields.io/badge/LM_Studio_Local_LLM-4F46E5?style=for-the-badge&logo=openai&logoColor=white" alt="LM Studio" /></a>
   <a href="https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events" target="_blank"><img src="https://img.shields.io/badge/SSE_Realtime_Stream-0ea5e9?style=for-the-badge&logo=transmission&logoColor=white" alt="SSE" /></a>
 </p>
@@ -68,6 +69,7 @@ Most of this stream is unstructured and noisy (routine earnings, dividend declar
 | **ASGI Server** | [Uvicorn](https://www.uvicorn.org/) | `0.29+` | Ultra-fast lightning ASGI production loop | [![Docs](https://img.shields.io/badge/Uvicorn-2C3E50?style=flat&logo=gunicorn&logoColor=white)](https://www.uvicorn.org/) |
 | **Local LLM** | [LM Studio](https://lmstudio.ai/) | `v1 API` | Local on-premise Bionic LLM inference (`:1234/v1`) | [![Docs](https://img.shields.io/badge/LM_Studio-4F46E5?style=flat&logo=openai&logoColor=white)](https://lmstudio.ai/) |
 | **Streaming** | [SSE](https://html.spec.whatwg.org/multipage/server-sent-events.html) | `W3C Spec` | Real-time continuous server push to dashboard clients | [![Docs](https://img.shields.io/badge/SSE-0ea5e9?style=flat&logo=rss&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) |
+| **Live Market Wire**| [Finnhub Stock News](https://finnhub.io/) | `v1 REST API` | Live Wall Street news stream per ticker (`JPM`, `GS`, `WFC`, `C`, `BAC`) | [![Docs](https://img.shields.io/badge/Finnhub-00D09C?style=flat&logo=statuspage&logoColor=white)](https://finnhub.io/docs/api) |
 
 ---
 
