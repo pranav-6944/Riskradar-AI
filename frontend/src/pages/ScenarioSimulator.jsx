@@ -4,6 +4,7 @@ import {
   Cpu, ShieldAlert, Zap, AlertTriangle, CheckCircle2, 
   ArrowRight, Play, RefreshCw, Scale, Sparkles 
 } from 'lucide-react';
+import { API_ENDPOINTS } from '../config/api';
 
 export const ScenarioSimulator = () => {
   const [selectedCompany, setSelectedCompany] = useState('Goldman Sachs');
@@ -61,7 +62,7 @@ export const ScenarioSimulator = () => {
 
     try {
       // 1. Direct NLP analysis
-      const res = await fetch('/ai-api/analyze', {
+      const res = await fetch(API_ENDPOINTS.aiAnalyze, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -73,7 +74,7 @@ export const ScenarioSimulator = () => {
       const data = await res.json();
 
       // 2. Commit ingestion into live cluster
-      const ingestRes = await fetch('/ai-api/ingest', {
+      const ingestRes = await fetch(API_ENDPOINTS.aiIngest, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

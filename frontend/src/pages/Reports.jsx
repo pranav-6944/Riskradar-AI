@@ -3,6 +3,7 @@ import {
   FileText, ShieldAlert, Download, Printer, CheckCircle2, 
   AlertTriangle, Calendar, Building, Sparkles 
 } from 'lucide-react';
+import { API_ENDPOINTS } from '../config/api';
 
 export const Reports = () => {
   const [companies, setCompanies] = useState([]);
@@ -13,7 +14,7 @@ export const Reports = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const res = await fetch('/api/v1/companies');
+        const res = await fetch(API_ENDPOINTS.companies);
         if (res.ok) {
           const data = await res.json();
           setCompanies(Array.isArray(data) ? data : Object.values(data));

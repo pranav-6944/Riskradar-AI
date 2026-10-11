@@ -9,6 +9,7 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer 
 } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
+import { API_ENDPOINTS } from '../config/api';
 
 export const Dashboard = () => {
   const [companies, setCompanies] = useState([]);
@@ -23,7 +24,7 @@ export const Dashboard = () => {
 
     const fetchSnapshot = async () => {
       try {
-        const res = await fetch('/api/v1/companies');
+        const res = await fetch(API_ENDPOINTS.companies);
         if (res.ok) {
           const data = await res.json();
           setCompanies(Array.isArray(data) ? data : Object.values(data));
@@ -37,7 +38,7 @@ export const Dashboard = () => {
 
     // Connect to Spring Boot SSE stream
     try {
-      eventSource = new EventSource('/api/v1/stream');
+      eventSource = new EventSource(API_ENDPOINTS.stream);
       
       eventSource.onopen = () => {
         setConnectionStatus('connected');

@@ -10,6 +10,7 @@ import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar 
 } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
+import { API_ENDPOINTS } from '../config/api';
 
 export const CompanyDetail = () => {
   const { ticker } = useParams();
@@ -24,7 +25,7 @@ export const CompanyDetail = () => {
     if (!t) return;
     setLlmLoading(true);
     try {
-      const res = await fetch(`/api/v1/companies/${t}/explanation`);
+      const res = await fetch(API_ENDPOINTS.explanation(t));
       if (res.ok) {
         const data = await res.json();
         if (data.explanation) {
@@ -33,7 +34,7 @@ export const CompanyDetail = () => {
         }
       }
       // Direct Python AI proxy fallback
-      const directRes = await fetch(`/ai-api/explain-json/${t}`);
+      const directRes = await fetch(API_ENDPOINTS.aiExplainJson(t));
       if (directRes.ok) {
         const directData = await directRes.json();
         if (directData.explanation) {
@@ -54,7 +55,7 @@ export const CompanyDetail = () => {
 
     const fetchCompanyData = async () => {
       try {
-        const res = await fetch(`/api/v1/companies/${ticker}`);
+        const res = await fetch(API_ENDPOINTS.company(ticker));
         if (res.ok && isMounted) {
           const data = await res.json();
           setCompany(data);

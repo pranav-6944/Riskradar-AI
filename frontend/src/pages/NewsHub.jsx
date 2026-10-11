@@ -4,6 +4,7 @@ import {
   AlertTriangle, CheckCircle2, Clock, Sparkles, RefreshCw, Radio 
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { API_ENDPOINTS } from '../config/api';
 
 export const NewsHub = () => {
   const [events, setEvents] = useState([]);
@@ -16,7 +17,7 @@ export const NewsHub = () => {
 
   const fetchNews = async () => {
     try {
-      const res = await fetch('/api/v1/news');
+      const res = await fetch(API_ENDPOINTS.news);
       if (res.ok) {
         const data = await res.json();
         setEvents(data);
@@ -48,7 +49,7 @@ export const NewsHub = () => {
     }
 
     try {
-      await fetch('/ai-api/ingest', {
+      await fetch(API_ENDPOINTS.aiIngest, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ company, text, source: 'Analyst Rapid Injection' }),
@@ -64,7 +65,7 @@ export const NewsHub = () => {
   const syncFinnhubNews = async (ticker = 'JPM') => {
     setFinnhubSyncing(true);
     try {
-      const res = await fetch(`/ai-api/api/v1/finnhub/sync/${ticker}`, {
+      const res = await fetch(API_ENDPOINTS.finnhubSync(ticker), {
         method: 'POST',
       });
       if (res.ok) {
@@ -80,7 +81,7 @@ export const NewsHub = () => {
   const syncAllFinnhub = async () => {
     setFinnhubSyncing(true);
     try {
-      const res = await fetch('/ai-api/api/v1/finnhub/sync-all', {
+      const res = await fetch(API_ENDPOINTS.finnhubSyncAll, {
         method: 'POST',
       });
       if (res.ok) {
