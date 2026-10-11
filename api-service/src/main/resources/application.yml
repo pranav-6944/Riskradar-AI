@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: RiskRadar-API-Gateway
+  threads:
+    virtual:
+      enabled: true
+
+riskradar:
+  ai-service:
+    url: http://localhost:8000
+  jwt:
+    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    expiration-ms: 86400000
