@@ -4,8 +4,10 @@ import {
   ShieldAlert, Scale, Cpu, Zap, Activity, ArrowRight, 
   CheckCircle2, Terminal, Code2, Database, Layers, BarChart 
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export const Features = () => {
+  const { isDark } = useTheme();
   const riskCategories = [
     {
       name: 'Legal Exposure',
@@ -98,7 +100,14 @@ export const Features = () => {
           ))}
 
           {/* Noise Filter Card */}
-          <div className="clay-card p-6 border-emerald-500/30 flex flex-col justify-between" style={{ background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.95) 100%)' }}>
+          <div 
+            className="clay-card p-6 border-emerald-500/30 flex flex-col justify-between" 
+            style={{ 
+              background: isDark 
+                ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.95) 100%)' 
+                : 'linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%)' 
+            }}
+          >
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-lg font-bold text-white m-0">Corporate Noise Filter</h3>

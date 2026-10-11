@@ -52,7 +52,7 @@ export const Reports = () => {
       </div>
 
       {/* ─── Printable Dossier Sheet ─────────────────────────────────── */}
-      <div className="clay-card p-8 sm:p-12 space-y-8 bg-slate-950/90 border border-slate-700/80">
+      <div className="clay-card p-8 sm:p-12 space-y-8 dark:bg-slate-950/90 light:bg-white dark:border-slate-700/80 light:border-slate-200 shadow-xl">
         {/* Dossier Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-slate-800 gap-4">
           <div className="flex items-center gap-3">

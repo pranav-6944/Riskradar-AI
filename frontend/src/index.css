@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  /* Default Flagship Dark Theme (Institutional Obsidian) */
+  /* ─── Flagship Dark Theme (Institutional Obsidian) ──────────────── */
   --bg-deep: #050811;
   --bg-card: #0b1120;
   --bg-surface: #111c35;
@@ -28,12 +28,12 @@
 }
 
 html.light {
-  /* High-Precision Light Theme (Swiss Alabaster FinTech) */
+  /* ─── Sovereign Light Theme (Swiss Alabaster FinTech) ────────────── */
   --bg-deep: #f8fafc;
   --bg-card: #ffffff;
   --bg-surface: #f1f5f9;
-  --bg-clay: #e2e8f0;
-  --border-subtle: rgba(15, 23, 42, 0.08);
+  --bg-clay: #ffffff;
+  --border-subtle: #e2e8f0;
 
   --primary-cyan: #0284c7;
   --primary-indigo: #4f46e5;
@@ -43,13 +43,13 @@ html.light {
   --accent-emerald: #059669;
 
   --text-main: #0f172a;
-  --text-muted: #475569;
-  --text-dim: #94a3b8;
+  --text-muted: #334155;
+  --text-dim: #64748b;
 
-  --clay-shadow-outer: 8px 14px 24px rgba(15, 23, 42, 0.06), -6px -6px 16px rgba(255, 255, 255, 0.95);
-  --clay-shadow-inner: inset 1px 1px 3px rgba(255, 255, 255, 0.9), inset -2px -2px 5px rgba(15, 23, 42, 0.06);
-  --clay-shadow-subtle: 4px 6px 14px rgba(15, 23, 42, 0.05), -3px -3px 10px rgba(255, 255, 255, 0.8);
-  --clay-shadow-pressed: inset 3px 3px 6px rgba(15, 23, 42, 0.12), inset -1px -1px 3px rgba(255, 255, 255, 0.8);
+  --clay-shadow-outer: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 10px 15px -3px rgba(15, 23, 42, 0.04), 0 20px 25px -5px rgba(15, 23, 42, 0.02);
+  --clay-shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 1);
+  --clay-shadow-subtle: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --clay-shadow-pressed: inset 0 2px 4px rgba(15, 23, 42, 0.08);
 }
 
 * {
@@ -66,7 +66,7 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -90,9 +90,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 html.light .clay-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04), var(--clay-shadow-inner);
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.04), 0 10px 15px -3px rgba(15, 23, 42, 0.05), 0 20px 25px -5px rgba(15, 23, 42, 0.02), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  color: #0f172a;
 }
 
 .clay-card:hover {
@@ -101,7 +102,8 @@ html.light .clay-card {
 }
 
 html.light .clay-card:hover {
-  box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.12), -4px -4px 16px rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
 }
 
 .clay-card-flat {
@@ -113,9 +115,13 @@ html.light .clay-card:hover {
 }
 
 html.light .clay-card-flat {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  color: #0f172a;
 }
+
+/* ─── Buttons ────────────────────────────────────────────────────── */
 
 .clay-btn {
   display: inline-flex;
@@ -134,7 +140,7 @@ html.light .clay-card-flat {
 }
 
 html.light .clay-btn {
-  box-shadow: 2px 4px 10px rgba(15, 23, 42, 0.08), inset 1px 1px 2px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .clay-btn-primary {
@@ -166,9 +172,10 @@ html.light .clay-btn {
 }
 
 html.light .clay-btn-secondary {
-  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-  color: #1e293b;
-  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
 }
 
 .clay-btn-secondary:hover {
@@ -178,8 +185,10 @@ html.light .clay-btn-secondary {
 }
 
 html.light .clay-btn-secondary:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  color: #0f172a;
+  background: #f1f5f9 !important;
+  color: #0284c7 !important;
+  border-color: #94a3b8 !important;
+  transform: translateY(-1px);
 }
 
 .clay-input {
@@ -196,9 +205,10 @@ html.light .clay-btn-secondary:hover {
 }
 
 html.light .clay-input {
-  background: #ffffff;
-  border-color: rgba(15, 23, 42, 0.15);
-  box-shadow: inset 1px 1px 3px rgba(15, 23, 42, 0.08);
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), inset 0 1px 2px rgba(15, 23, 42, 0.03) !important;
 }
 
 .clay-input:focus {
@@ -207,8 +217,8 @@ html.light .clay-input {
 }
 
 html.light .clay-input:focus {
-  border-color: #0284c7;
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
 }
 
 .clay-badge {
@@ -225,6 +235,10 @@ html.light .clay-input:focus {
   border: 1px solid var(--border-subtle);
 }
 
+html.light .clay-badge {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+}
+
 /* ─── Parallax & Ambient Background ──────────────────────────────── */
 
 .ambient-glow {
@@ -237,7 +251,7 @@ html.light .clay-input:focus {
 }
 
 html.light .ambient-glow {
-  opacity: 0.12;
+  opacity: 0.14;
   filter: blur(120px);
 }
 
@@ -251,6 +265,176 @@ html.light .ambient-glow {
 
 .glow-rose {
   background: radial-gradient(circle, #f43f5e 0%, rgba(244, 63, 94, 0) 70%);
+}
+
+/* ─── Universal High-Contrast Light Mode Enforcements ────────────── */
+
+/* Force headings to deep obsidian navy */
+html.light h1:not([class*="text-rose"]):not([class*="text-emerald"]):not([class*="text-sky"]):not([class*="text-amber"]):not([class*="text-indigo"]):not(.clay-btn *),
+html.light h2:not([class*="text-rose"]):not([class*="text-emerald"]):not([class*="text-sky"]):not([class*="text-amber"]):not([class*="text-indigo"]):not(.clay-btn *),
+html.light h3:not([class*="text-rose"]):not([class*="text-emerald"]):not([class*="text-sky"]):not([class*="text-amber"]):not([class*="text-indigo"]):not(.clay-btn *),
+html.light h4:not([class*="text-rose"]):not([class*="text-emerald"]):not([class*="text-sky"]):not([class*="text-amber"]):not([class*="text-indigo"]):not(.clay-btn *),
+html.light h5:not([class*="text-rose"]):not([class*="text-emerald"]):not([class*="text-sky"]):not([class*="text-amber"]):not([class*="text-indigo"]):not(.clay-btn *),
+html.light h6:not([class*="text-rose"]):not([class*="text-emerald"]):not([class*="text-sky"]):not([class*="text-amber"]):not([class*="text-indigo"]):not(.clay-btn *) {
+  color: #090e17 !important;
+}
+
+/* Text white override: only elements that genuinely belong white (e.g. primary blue buttons) stay white */
+html.light .text-white:not(.clay-btn-primary):not(.clay-btn-primary *):not(.clay-btn-danger):not(.clay-btn-danger *):not([class*="bg-sky-500"]):not([class*="bg-blue-600"]):not([class*="bg-rose-500"]):not([class*="bg-emerald-500"]):not([class*="bg-gradient"]) {
+  color: #090e17 !important;
+}
+
+html.light strong.text-white {
+  color: #090e17 !important;
+}
+
+/* Secondary & Body Text in Light Mode */
+html.light .text-slate-200 {
+  color: #1e293b !important;
+}
+
+html.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+html.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light .text-slate-500 {
+  color: #64748b !important;
+}
+
+/* Dark surface insets converted to luminous light surfaces */
+html.light .bg-slate-950,
+html.light .bg-slate-950\/90,
+html.light .bg-slate-950\/80,
+html.light .bg-slate-950\/70,
+html.light .bg-slate-950\/60,
+html.light .bg-slate-950\/40 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b;
+}
+
+html.light .bg-slate-900,
+html.light .bg-slate-900\/90,
+html.light .bg-slate-900\/80,
+html.light .bg-slate-900\/70,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/40 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b;
+}
+
+/* Dark borders converted to crisp light borders */
+html.light .border-slate-800,
+html.light .border-slate-800\/90,
+html.light .border-slate-800\/80,
+html.light .border-slate-800\/70,
+html.light .border-slate-700,
+html.light .border-slate-700\/80,
+html.light .border-slate-700\/60 {
+  border-color: #e2e8f0 !important;
+}
+
+/* Form inputs & dropdowns */
+html.light input,
+html.light select,
+html.light textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Badges & Vector indicators in Light Mode */
+html.light .bg-sky-950\/60,
+html.light .bg-sky-950\/80,
+html.light .bg-sky-950\/90,
+html.light .bg-sky-950 {
+  background-color: #e0f2fe !important;
+  color: #0284c7 !important;
+  border-color: #bae6fd !important;
+}
+
+html.light .bg-rose-950\/40,
+html.light .bg-rose-950\/60,
+html.light .bg-rose-950\/80,
+html.light .bg-rose-950 {
+  background-color: #ffe4e6 !important;
+  color: #e11d48 !important;
+  border-color: #fecdd3 !important;
+}
+
+html.light .bg-amber-950\/40,
+html.light .bg-amber-950\/60,
+html.light .bg-amber-950\/80,
+html.light .bg-amber-950 {
+  background-color: #fef3c7 !important;
+  color: #d97706 !important;
+  border-color: #fde68a !important;
+}
+
+html.light .bg-emerald-950\/40,
+html.light .bg-emerald-950\/60,
+html.light .bg-emerald-950\/80,
+html.light .bg-emerald-950 {
+  background-color: #d1fae5 !important;
+  color: #059669 !important;
+  border-color: #a7f3d0 !important;
+}
+
+html.light .bg-indigo-950\/40,
+html.light .bg-indigo-950\/60,
+html.light .bg-indigo-950\/80,
+html.light .bg-indigo-950 {
+  background-color: #e0e7ff !important;
+  color: #4f46e5 !important;
+  border-color: #c7d2fe !important;
+}
+
+/* Light mode overrides for hardcoded dark inline styles */
+html.light [style*="rgba(15, 23, 42"] {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%) !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light [style*="rgba(16, 185, 129, 0.08)"] {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%) !important;
+  border-color: #a7f3d0 !important;
+}
+
+html.light [style*="#090e1a"] {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* ─── Recharts Tooltips & Axis in Light Mode ─────────────────────── */
+
+html.light .recharts-default-tooltip {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.08) !important;
+  border-radius: 12px !important;
+}
+
+html.light .recharts-tooltip-label {
+  color: #0f172a !important;
+  font-weight: 600;
+}
+
+html.light .recharts-cartesian-axis-tick text {
+  fill: #64748b !important;
+}
+
+html.light .recharts-polar-grid-concentric path,
+html.light .recharts-polar-grid-angle line {
+  stroke: #e2e8f0 !important;
+}
+
+html.light .recharts-polar-angle-axis text {
+  fill: #475569 !important;
 }
 
 /* ─── Radar Animations ───────────────────────────────────────────── */
@@ -275,6 +459,10 @@ html.light .ambient-glow {
   animation: radar-spin 4s linear infinite;
 }
 
+html.light .radar-sweep-arm {
+  background: linear-gradient(90deg, #0284c7, transparent);
+}
+
 @keyframes pulse-ring {
   0% {
     transform: scale(0.95);
@@ -294,7 +482,8 @@ html.light .ambient-glow {
   animation: pulse-ring 3s ease-in-out infinite;
 }
 
-/* Scrollbar */
+/* ─── Scrollbar ──────────────────────────────────────────────────── */
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -311,4 +500,7 @@ html.light ::-webkit-scrollbar-thumb {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #475569;
+}
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

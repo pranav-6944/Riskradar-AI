@@ -9,9 +9,11 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar 
 } from 'recharts';
+import { useTheme } from '../context/ThemeContext';
 
 export const CompanyDetail = () => {
   const { ticker } = useParams();
+  const { isDark } = useTheme();
   const [company, setCompany] = useState(null);
   const [llmExplanation, setLlmExplanation] = useState('');
   const [llmLoading, setLlmLoading] = useState(false);
@@ -265,11 +267,17 @@ export const CompanyDetail = () => {
                       <stop offset="95%" stopColor="#38bdf8" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="time" stroke="#475569" fontSize={10} />
-                  <YAxis domain={[0, 100]} stroke="#475569" fontSize={10} />
+                  <XAxis dataKey="time" stroke={isDark ? '#475569' : '#94a3b8'} fontSize={10} />
+                  <YAxis domain={[0, 100]} stroke={isDark ? '#475569' : '#94a3b8'} fontSize={10} />
                   <Tooltip 
-                    contentStyle={{ background: '#090e1a', border: '1px solid #1e293b', borderRadius: '8px', fontSize: '12px' }}
-                    labelStyle={{ color: '#94a3b8' }}
+                    contentStyle={{ 
+                      background: isDark ? '#090e1a' : '#ffffff', 
+                      border: isDark ? '1px solid #1e293b' : '1px solid #e2e8f0', 
+                      borderRadius: '8px', 
+                      fontSize: '12px',
+                      color: isDark ? '#ffffff' : '#0f172a'
+                    }}
+                    labelStyle={{ color: isDark ? '#94a3b8' : '#64748b' }}
                   />
                   <Area 
                     type="monotone" 
@@ -304,9 +312,9 @@ export const CompanyDetail = () => {
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData}>
-                  <PolarGrid stroke="#334155" />
-                  <PolarAngleAxis dataKey="category" stroke="#94a3b8" fontSize={10} />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#475569" fontSize={8} />
+                  <PolarGrid stroke={isDark ? '#334155' : '#e2e8f0'} />
+                  <PolarAngleAxis dataKey="category" stroke={isDark ? '#94a3b8' : '#475569'} fontSize={10} />
+                  <PolarRadiusAxis angle={30} domain={[0, 100]} stroke={isDark ? '#475569' : '#94a3b8'} fontSize={8} />
                   <Radar 
                     name={company.company} 
                     dataKey="score" 
@@ -325,7 +333,14 @@ export const CompanyDetail = () => {
       </div>
 
       {/* ─── Local Bionic LLM Explainer Card ──────────────────────────── */}
-      <div className="clay-card p-6 sm:p-8 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 27, 75, 0.9) 100%)' }}>
+      <div 
+        className="clay-card p-6 sm:p-8 relative overflow-hidden" 
+        style={{ 
+          background: isDark 
+            ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 27, 75, 0.9) 100%)' 
+            : 'linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%)' 
+        }}
+      >
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-slate-700/60 gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-indigo-950/80 border border-indigo-500/40 text-indigo-400">

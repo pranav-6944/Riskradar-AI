@@ -125,7 +125,6 @@ export const ScenarioSimulator = () => {
                   setResult(null);
                 }}
                 className="clay-input text-sm font-semibold cursor-pointer"
-                style={{ background: '#090e1a' }}
               >
                 <option value="JPMorgan Chase">JPMorgan Chase (JPM)</option>
                 <option value="Goldman Sachs">Goldman Sachs (GS)</option>
