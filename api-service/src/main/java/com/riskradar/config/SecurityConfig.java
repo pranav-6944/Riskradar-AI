@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/auth/**",
@@ -48,6 +49,7 @@ public class SecurityConfig {
                                 "/api/v1/companies/**",
                                 "/api/v1/news/**",
                                 "/internal/**",
+                                "/h2-console/**",
                                 "/error"
                         ).permitAll()
                         .anyRequest().authenticated()

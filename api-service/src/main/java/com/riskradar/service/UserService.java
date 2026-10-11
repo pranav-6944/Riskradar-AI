@@ -3,60 +3,74 @@ package com.riskradar.service;
 import com.riskradar.dto.LoginRequest;
 import com.riskradar.dto.SignupRequest;
 import com.riskradar.dto.UserDto;
+import com.riskradar.entity.UserEntity;
 import com.riskradar.model.Role;
 import com.riskradar.model.User;
+import com.riskradar.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class UserService {
 
-    private final Map<String, User> userStore = new ConcurrentHashMap<>();
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Map<String, User> cache = new ConcurrentHashMap<>();
 
-    public UserService(PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         initSeedUsers();
     }
 
     private void initSeedUsers() {
-        // Default Lead Analyst
-        User analyst = new User(
-                UUID.randomUUID().toString(),
-                "analyst@riskradar.io",
-                passwordEncoder.encode("password123"),
-                "Pranav Lamkhade",
-                Role.ROLE_ANALYST,
-                "Goldman Sachs RegTech Labs",
-                Instant.now()
-        );
-        userStore.put(analyst.getEmail().toLowerCase(), analyst);
+        // Seed Lead Analyst into Database
+        if (!userRepository.existsByEmailIgnoreCase("analyst@riskradar.io")) {
+            UserEntity analyst = new UserEntity(
+                    UUID.randomUUID().toString(),
+                    "analyst@riskradar.io",
+                    passwordEncoder.encode("password123"),
+                    "Pranav Lamkhade",
+                    Role.ROLE_ANALYST,
+                    "Goldman Sachs RegTech Labs",
+                    Instant.now()
+            );
+            userRepository.save(analyst);
+        }
 
-        // Default Admin User
-        User admin = new User(
-                UUID.randomUUID().toString(),
-                "admin@riskradar.io",
-                passwordEncoder.encode("admin123"),
-                "Lead Compliance Officer",
-                Role.ROLE_ADMIN,
-                "RiskRadar Global Surveillance",
-                Instant.now()
-        );
-        userStore.put(admin.getEmail().toLowerCase(), admin);
+        // Seed Admin into Database
+        if (!userRepository.existsByEmailIgnoreCase("admin@riskradar.io")) {
+            UserEntity admin = new UserEntity(
+                    UUID.randomUUID().toString(),
+                    "admin@riskradar.io",
+                    passwordEncoder.encode("admin123"),
+                    "Lead Compliance Officer",
+                    Role.ROLE_ADMIN,
+                    "RiskRadar Global Surveillance",
+                    Instant.now()
+            );
+            userRepository.save(admin);
+        }
+
+        // Populate cache from DB
+        userRepository.findAll().forEach(entity -> {
+            cache.put(entity.getEmail().toLowerCase(), entityToModel(entity));
+        });
     }
 
     public User registerUser(SignupRequest req) {
         String normalizedEmail = req.getEmail().trim().toLowerCase();
-        if (userStore.containsKey(normalizedEmail)) {
-            throw new IllegalArgumentException("User with email " + req.getEmail() + " already exists");
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new IllegalArgumentException("User with email " + req.getEmail() + " already exists in database");
         }
 
-        User newUser = new User(
+        UserEntity entity = new UserEntity(
                 UUID.randomUUID().toString(),
                 normalizedEmail,
                 passwordEncoder.encode(req.getPassword()),
@@ -66,22 +80,34 @@ public class UserService {
                 Instant.now()
         );
 
-        userStore.put(normalizedEmail, newUser);
-        return newUser;
+        UserEntity saved = userRepository.save(entity);
+        User model = entityToModel(saved);
+        cache.put(normalizedEmail, model);
+        return model;
     }
 
     public User authenticate(LoginRequest req) {
         String normalizedEmail = req.getEmail().trim().toLowerCase();
-        User user = userStore.get(normalizedEmail);
-        if (user == null || !passwordEncoder.matches(req.getPassword(), user.getPasswordHash())) {
+        Optional<UserEntity> entityOpt = userRepository.findByEmailIgnoreCase(normalizedEmail);
+        
+        if (entityOpt.isEmpty() || !passwordEncoder.matches(req.getPassword(), entityOpt.get().getPasswordHash())) {
             throw new IllegalArgumentException("Invalid email or password");
         }
+        
+        User user = entityToModel(entityOpt.get());
+        cache.put(normalizedEmail, user);
         return user;
     }
 
     public User findByEmail(String email) {
         if (email == null) return null;
-        return userStore.get(email.trim().toLowerCase());
+        String normalized = email.trim().toLowerCase();
+        User cached = cache.get(normalized);
+        if (cached != null) return cached;
+
+        return userRepository.findByEmailIgnoreCase(normalized)
+                .map(this::entityToModel)
+                .orElse(null);
     }
 
     public UserDto toDto(User user) {
@@ -92,6 +118,18 @@ public class UserService {
                 user.getRole(),
                 user.getInstitution(),
                 user.getCreatedAt()
+        );
+    }
+
+    private User entityToModel(UserEntity entity) {
+        return new User(
+                entity.getId(),
+                entity.getEmail(),
+                entity.getPasswordHash(),
+                entity.getFullName(),
+                entity.getRole(),
+                entity.getInstitution(),
+                entity.getCreatedAt()
         );
     }
 }
