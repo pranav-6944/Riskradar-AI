@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # 1. AI NLP Microservice & Continuous Finnhub Streamer
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: riskradar-ai
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - GATEWAY_INTERNAL_URL=http://api-service:8080/internal/event
+      - FINNHUB_API_KEY=db5map9r01qv1n8viqtgdb5map9r01qv1n8viqu0
+    restart: unless-stopped
+    networks:
+      - riskradar-net
+
+  # 2. Spring Boot API Gateway & Real-Time SSE Hub
+  api-service:
+    build:
+      context: ./api-service
+      dockerfile: Dockerfile
+    container_name: riskradar-api
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - RISKRADAR_AI_SERVICE_URL=http://ai-service:8000
+    depends_on:
+      - ai-service
+    restart: unless-stopped
+    volumes:
+      - h2-data:/app/data
+    networks:
+      - riskradar-net
+
+  # 3. React 19 + Vite Frontend served via Nginx Reverse Proxy
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: riskradar-frontend
+    ports:
+      - "80:80"
+      - "5173:80"
+    depends_on:
+      - api-service
+      - ai-service
+    restart: unless-stopped
+    networks:
+      - riskradar-net
+
+networks:
+  riskradar-net:
+    driver: bridge
+
+volumes:
+  h2-data:

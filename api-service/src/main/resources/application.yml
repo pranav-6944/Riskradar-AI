@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   application:
@@ -8,10 +8,10 @@ spring:
     virtual:
       enabled: true
   datasource:
-    url: jdbc:h2:file:./data/riskradar;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:./data/riskradar;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE}
     driverClassName: org.h2.Driver
-    username: sa
-    password: password
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
@@ -26,7 +26,8 @@ spring:
 
 riskradar:
   ai-service:
-    url: http://localhost:8000
+    url: ${RISKRADAR_AI_SERVICE_URL:http://localhost:8000}
   jwt:
-    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
     expiration-ms: 86400000
+

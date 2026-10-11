@@ -3,13 +3,14 @@ RiskRadar AI - Continuous Real-Time News & Regulatory Complaint Simulator
 Generates realistic financial news and complaints, classifies via NLP, and dispatches to Spring Boot Gateway.
 """
 
+import os
 import asyncio
 import random
 import httpx
 from datetime import datetime
 from risk_engine import ingest, COMPANIES
 
-SPRING_BOOT_INTERNAL_URL = "http://localhost:8080/internal/event"
+SPRING_BOOT_INTERNAL_URL = os.getenv("GATEWAY_INTERNAL_URL", "http://localhost:8080/internal/event")
 
 SIMULATION_TEMPLATES = [
     # ─── HIGH RISK: Legal & Regulatory (DOJ, SEC, Class Actions) ──────────────

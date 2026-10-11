@@ -1,0 +1,50 @@
+services:
+  # 1. AI NLP Microservice (Python FastAPI)
+  - type: web
+    name: riskradar-ai
+    runtime: docker
+    dockerContext: ./ai-service
+    dockerfilePath: ./ai-service/Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: FINNHUB_API_KEY
+        value: db5map9r01qv1n8viqtgdb5map9r01qv1n8viqu0
+      - key: GATEWAY_INTERNAL_URL
+        fromService:
+          type: web
+          name: riskradar-api
+          property: host
+        transform: "http://{host}/internal/event"
+
+  # 2. Spring Boot API Gateway (Java 21)
+  - type: web
+    name: riskradar-api
+    runtime: docker
+    dockerContext: ./api-service
+    dockerfilePath: ./api-service/Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: RISKRADAR_AI_SERVICE_URL
+        fromService:
+          type: web
+          name: riskradar-ai
+          property: host
+        transform: "http://{host}"
+
+  # 3. React Frontend Web Application (Nginx Container)
+  - type: web
+    name: riskradar-frontend
+    runtime: docker
+    dockerContext: ./frontend
+    dockerfilePath: ./frontend/Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 80

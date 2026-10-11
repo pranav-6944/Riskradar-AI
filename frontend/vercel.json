@@ -1,0 +1,23 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/v1/:match*",
+      "destination": "https://riskradar-api.onrender.com/api/v1/:match*"
+    },
+    {
+      "source": "/api/:match*",
+      "destination": "https://riskradar-api.onrender.com/api/:match*"
+    },
+    {
+      "source": "/ai-api/:match*",
+      "destination": "https://riskradar-ai.onrender.com/:match*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

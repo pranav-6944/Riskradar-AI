@@ -12,7 +12,7 @@ from typing import List, Dict, Optional, Set
 
 FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY", "db5map9r01qv1n8viqtgdb5map9r01qv1n8viqu0")
 BASE_URL = "https://finnhub.io/api/v1"
-SPRING_BOOT_INTERNAL_URL = "http://localhost:8080/internal/event"
+SPRING_BOOT_INTERNAL_URL = os.getenv("GATEWAY_INTERNAL_URL", "http://localhost:8080/internal/event")
 
 TICKER_MAP = {
     "JPM": "JPMorgan Chase",
