@@ -82,24 +82,26 @@ async def ingest_custom_event(req: IngestRequest):
 @app.get("/explain/{company_name}")
 async def explain_company_risk_stream(company_name: str):
     """Streams explanation tokens directly from local Bionic LLM (LM Studio)."""
-    if company_name not in COMPANIES:
+    resolved_name = TICKER_MAP.get(company_name.upper(), company_name)
+    if resolved_name not in COMPANIES:
         raise HTTPException(status_code=404, detail=f"Company '{company_name}' not found")
     
     return StreamingResponse(
-        stream_explanation(company_name),
+        stream_explanation(resolved_name),
         media_type="text/plain"
     )
 
 @app.get("/explain-json/{company_name}")
 async def explain_company_risk_json(company_name: str):
     """Returns structured analyst assessment from Bionic LLM or rule-based fallback."""
-    if company_name not in COMPANIES:
+    resolved_name = TICKER_MAP.get(company_name.upper(), company_name)
+    if resolved_name not in COMPANIES:
         raise HTTPException(status_code=404, detail=f"Company '{company_name}' not found")
     
-    text = await get_explanation(company_name)
+    text = await get_explanation(resolved_name)
     return {
-        "company": company_name,
-        "ticker": COMPANIES[company_name]["ticker"],
+        "company": resolved_name,
+        "ticker": COMPANIES[resolved_name]["ticker"],
         "explanation": text
     }
 

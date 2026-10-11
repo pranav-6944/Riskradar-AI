@@ -16,7 +16,8 @@ LM_STUDIO_MODEL = os.getenv("LLM_MODEL", "bionic")
 client = AsyncOpenAI(
     base_url=LM_STUDIO_BASE_URL,
     api_key="lm-studio-local",
-    timeout=10.0,
+    timeout=2.0,
+    max_retries=0,
 )
 
 SYSTEM_PROMPT = """You are RiskRadar AI, a senior quantitative RegTech and corporate risk intelligence analyst.
