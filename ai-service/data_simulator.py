@@ -113,28 +113,33 @@ class DataSimulator:
             pass
 
     async def _simulation_loop(self):
-        # Initial sleep before first emit
-        await asyncio.sleep(3)
-        loop_count = 0
+        """
+        Continuous Live News Poller:
+        Polls and ingests ONLY real-world live financial news from Finnhub Stock API
+        for the tracked companies (JPM, GS, WFC, C, BAC).
+        Demo news simulation is completely stopped; automatic stream is 100% live.
+        """
+        await asyncio.sleep(2)
+        from finnhub_client import finnhub, TICKER_MAP
+        tickers = list(TICKER_MAP.keys())
+        ticker_idx = 0
+        
         while self._running:
             try:
-                loop_count += 1
-                # Interleave real live Finnhub news every 3rd cycle
-                if loop_count % 3 == 0:
-                    try:
-                        from finnhub_client import finnhub, TICKER_MAP
-                        random_ticker = random.choice(list(TICKER_MAP.keys()))
-                        res = await finnhub.ingest_live_news_item(random_ticker, item_index=random.randint(0, 8))
-                        if not res:
-                            await self.generate_single_event()
-                    except Exception:
-                        await self.generate_single_event()
-                else:
-                    await self.generate_single_event()
+                # Cycle through tracked institutions
+                ticker = tickers[ticker_idx % len(tickers)]
+                ticker_idx += 1
+                
+                # Ingest only real live Finnhub news for this company
+                result = await finnhub.ingest_next_live_article(ticker)
+                if result:
+                    event = result.get("event", {})
+                    headline = event.get('headline') or event.get('text', '')
+                    print(f"[Live Finnhub Stream] Ingested live article for {ticker}: {headline[:80]}...")
             except Exception as e:
-                print(f"[Simulator] Error: {e}")
+                print(f"[Live Finnhub Stream] Error: {e}")
             
-            # Fire next item every 8 to 14 seconds
+            # Poll & dispatch next real live article every 8 to 14 seconds
             await asyncio.sleep(random.uniform(8.0, 14.0))
 
 simulator = DataSimulator()

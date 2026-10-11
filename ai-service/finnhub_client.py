@@ -7,7 +7,8 @@ import os
 import httpx
 from datetime import datetime, timedelta
 import asyncio
-from typing import List, Dict, Optional
+import random
+from typing import List, Dict, Optional, Set
 
 FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY", "db5map9r01qv1n8viqtgdb5map9r01qv1n8viqu0")
 BASE_URL = "https://finnhub.io/api/v1"
@@ -27,6 +28,8 @@ class FinnhubClient:
     def __init__(self, api_key: str = FINNHUB_API_KEY):
         self.api_key = api_key
         self._cache: Dict[str, List[dict]] = {}
+        self._article_index: Dict[str, int] = {k: 0 for k in TICKER_MAP.keys()}
+        self._seen_ids: Set[int] = set()
 
     async def fetch_company_news(self, symbol: str, days_back: int = 14) -> List[dict]:
         """Fetches live real-world news articles for a financial institution ticker from Finnhub."""
@@ -74,45 +77,89 @@ class FinnhubClient:
             print(f"[Finnhub] Error fetching market news: {e}")
             return []
 
-    async def ingest_live_news_item(self, symbol: str, item_index: int = 0) -> Optional[dict]:
+    async def ingest_next_live_article(self, symbol: str) -> Optional[dict]:
         """
-        Fetches live article for ticker, runs 120+ regex NLP classification,
-        computes CRI impact, and posts live event to Java Spring Boot gateway.
+        Pulls the next real, live Finnhub article for this company, classifies it
+        via the 120+ regex NLP engine, updates rolling CRI, and dispatches to Spring Boot.
         """
-        from risk_engine import ingest
-        
         symbol = symbol.upper()
-        company_name = TICKER_MAP.get(symbol, "JPMorgan Chase")
+        articles = self._cache.get(symbol)
         
-        articles = await self.fetch_company_news(symbol, days_back=14)
+        # If cache empty or exhausted, fetch fresh from Finnhub
         if not articles:
-            # Fallback to general market news
+            articles = await self.fetch_company_news(symbol, days_back=14)
+            if articles:
+                self._cache[symbol] = articles
+
+        if not articles:
+            # Fallback to general market news if company news empty
             articles = await self.fetch_market_news()
 
         if not articles:
             return None
 
-        # Pick article at requested index
+        # Find the next unseen article
+        chosen_article = None
+        current_idx = self._article_index.get(symbol, 0)
+        
+        for i in range(len(articles)):
+            idx = (current_idx + i) % len(articles)
+            candidate = articles[idx]
+            cand_id = candidate.get("id")
+            if cand_id not in self._seen_ids:
+                chosen_article = candidate
+                self._seen_ids.add(cand_id)
+                self._article_index[symbol] = idx + 1
+                break
+
+        # If all articles in cache have been seen once, recycle oldest
+        if not chosen_article:
+            idx = current_idx % len(articles)
+            chosen_article = articles[idx]
+            self._article_index[symbol] = (idx + 1) % len(articles)
+
+        return await self._process_and_dispatch(chosen_article, symbol)
+
+    async def ingest_live_news_item(self, symbol: str, item_index: int = 0) -> Optional[dict]:
+        """Direct manual sync for a specific article index."""
+        symbol = symbol.upper()
+        articles = self._cache.get(symbol) or await self.fetch_company_news(symbol, days_back=14)
+        if not articles:
+            articles = await self.fetch_market_news()
+
+        if not articles:
+            return None
+
         article = articles[item_index % len(articles)]
-        headline = article.get("headline", "")
-        summary = article.get("summary", "")
+        return await self._process_and_dispatch(article, symbol)
+
+    async def _process_and_dispatch(self, article: dict, symbol: str) -> Optional[dict]:
+        from risk_engine import ingest
+        
+        company_name = TICKER_MAP.get(symbol.upper(), "JPMorgan Chase")
+        headline = article.get("headline", "").strip()
+        summary = article.get("summary", "").strip()
         source_name = f"Finnhub Live Wire ({article.get('source', 'Reuters')})"
         
         combined_text = f"{headline}. {summary}".strip()
         if not combined_text:
             combined_text = headline
+            
+        if not combined_text:
+            return None
 
-        # Run full NLP analysis & CRI computation
+        # 1. Run 120+ regex NLP engine & CRI computation
         result = ingest(combined_text, company_name, source_name)
         
-        # Attach raw Finnhub metadata
+        # 2. Attach live Finnhub metadata
         if "event" in result:
             result["event"]["url"] = article.get("url", "")
             result["event"]["image"] = article.get("image", "")
             result["event"]["finnhubId"] = article.get("id", "")
             result["event"]["isLiveApi"] = True
+            result["event"]["datetime"] = article.get("datetime", int(datetime.now().timestamp()))
 
-        # Asynchronously dispatch to Spring Boot internal webhook
+        # 3. Asynchronously post to Java Spring Boot internal webhook
         asyncio.create_task(self._post_to_spring_boot(result.get("event")))
         return result
 

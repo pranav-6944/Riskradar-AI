@@ -108,24 +108,27 @@ export const NewsHub = () => {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white dark:text-white light:text-slate-900 m-0 font-heading">
-              Regulatory Stream & Noise Filter
+              Live Regulatory & Market News Stream
             </h1>
-            <span className="clay-badge text-xs text-indigo-400 dark:text-indigo-400 light:text-indigo-600 bg-indigo-500/10 border-indigo-500/30">
-              Live Ingestion Feed
+            <span className="clay-badge text-xs text-sky-400 dark:text-sky-400 light:text-sky-600 bg-sky-500/10 border-sky-500/30 font-mono">
+              ● 100% LIVE FINNHUB API STREAM
             </span>
           </div>
           <p className="text-sm text-slate-400 dark:text-slate-400 light:text-slate-600 mt-1">
-            Continuous NLP evaluation separating critical legal/operational alerts from routine corporate PR.
+            Continuous real-time Wall Street news automatically detected and synced for JPM, GS, WFC, C, and BAC.
           </p>
         </div>
 
         {/* Rapid Test Injection Buttons for Judges */}
         <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[11px] font-mono text-slate-400 dark:text-slate-400 light:text-slate-500 hidden sm:inline mr-1">
+            Manual Stress Testing:
+          </span>
           <button
             onClick={() => injectQuickEvent('doj')}
             disabled={injecting}
             className="clay-btn clay-btn-danger text-xs py-2 px-3 shadow-sm"
-            title="Inject DOJ Indictment"
+            title="Inject DOJ Indictment Stress Test"
           >
             <AlertTriangle className="w-3.5 h-3.5" />
             <span>+ DOJ Threat</span>
